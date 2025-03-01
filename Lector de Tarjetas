@@ -3,10 +3,8 @@ import busio
 from py532lib.i2c import Pn532_i2c
 import time
 
-Establece la comunicación I2C con la Raspberry Pi
 i2c = busio.I2C(board.SCL, board.SDA)
 
-Inicializa el lector PN532
 pn532 = Pn532_i2c(i2c)
 
 print("Esperando una tarjeta NFC...")
