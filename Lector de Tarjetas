@@ -2,16 +2,24 @@ import time
 import serial
 from adafruit_pn532.uart import PN532_UART
 
-# Configuración del UART
+# Configuración del UART usando pyserial
 uart = serial.Serial('/dev/serial0', baudrate=115200, timeout=1)
 
-# Inicialización del PN532
-pn532 = PN532_UART(uart, debug=False)
+# Configuración del módulo PN532
+pn532 = PN532_UART(uart, debug=False)  # Deshabilitar depuración
+pn532.SAM_configuration()
 
-# Esperando una tarjeta NFC
-print("Esperando una tarjeta NFC...")
+waiting_message_printed = False
+
 while True:
-    uid = pn532.read_passive_target()
-    if uid is not None:
-        print("¡Tarjeta detectada! UID:", [hex(i) for i in uid])
+    uid = pn532.read_passive_target(timeout=1)
+    if uid is None:
+        if not waiting_message_printed:
+            print("Esperando una tarjeta...")
+            waiting_message_printed = True
         time.sleep(1)
+        continue
+    # Convertir el UID a una cadena hexadecimal concatenada
+    uid_str = ''.join([f'{i:02X}' for i in uid])
+    print(f'Encontrado UID de tarjeta: {uid_str}')
+    break  # Detener el bucle cuando se encuentre una tarjeta
